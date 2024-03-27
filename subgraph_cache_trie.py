@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, Any
 
 from trie import Node, Trie
@@ -6,7 +6,7 @@ from trie import Node, Trie
 
 @dataclass
 class SubgraphCacheNode(Node):
-    cache: Dict[str, Any]
+    cache: Dict[str, Any] = field(default_factory=dict)
 
 
 class SubgraphCacheTrie(Trie):
@@ -16,7 +16,8 @@ class SubgraphCacheTrie(Trie):
 
     def insert(self, key, value):
         node = super().insert(key, value)
-        for ancestor in SubgraphCacheTrie._ancestors(node):
+        node.cache[node.key] = node.value
+        for ancestor in self._ancestors(node):
             ancestor.cache[node.key] = node.value
 
     def delete(self, key):
@@ -24,11 +25,11 @@ class SubgraphCacheTrie(Trie):
         if node is None:
             return
         super().delete(key)
-        for ancestor in SubgraphCacheTrie._ancestors(node):
+        for ancestor in self._ancestors(node):
             del ancestor.cache[node.key]
 
     @staticmethod
-    def _ancestors(node: Node):
+    def _ancestors(node: SubgraphCacheNode):
         ancestor = node.parent
         while ancestor is not None:
             yield ancestor

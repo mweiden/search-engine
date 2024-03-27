@@ -38,7 +38,7 @@ class Trie:
             current_node = current_node[c]
         current_node.value = value
         current_node.is_terminal = True
-        return Node
+        return current_node
 
     def delete(self, key: str):
         def inner(node, key) -> Node:
