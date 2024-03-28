@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Autocomplete</title>
+    <script>
+
+        function setSuggestions(suggestions) {
+            const dataList = document.getElementById('suggestions');
+            dataList.innerHTML = '';
+            suggestions.forEach((item) => {
+                const option = document.createElement('option');
+                option.value = item;
+                dataList.appendChild(option);
+            });
+        }
+
+        function sendPostRequest(value) {
+            fetch('/autocomplete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: value }),
+            })
+            .then(response => response.json())
+            .then(suggestions => setSuggestions(suggestions))
+            .catch((error) => console.error('Error:', error));
+        }
+
+        function setup() {
+            const input = document.querySelector('input[name="query"]');
+            input.addEventListener('input', (event) => {
+                sendPostRequest(event.target.value);
+            });
+        }
+
+        window.onload = setup;
+    </script>
+</head>
+<body>
+    <h2>Enter Something</h2>
+    <form method="post">
+        <input type="text" name="query" list="suggestions" />
+        <datalist id="suggestions"></datalist>
+        <input type="submit" value="Submit" />
+    </form>
+    <p>{{ submission_text }}</p>
+</body>
+</html>
