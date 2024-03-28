@@ -16,6 +16,7 @@ def test_insert():
     assert t.root["a"]["l"].cache_sorted_keys == ["all"]
     assert t.root["a"]["n"].cache_sorted_keys == ["an", "any"]
 
+
 def test_delete():
     t = SubgraphCacheTrie()
     t.insert("all", 1)

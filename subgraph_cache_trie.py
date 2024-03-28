@@ -21,7 +21,8 @@ class SubgraphCacheNode(Node):
         """
         if self.is_dirty:
             self._cache_sorted_keys = [
-                ele[0] for ele in sorted(
+                ele[0]
+                for ele in sorted(
                     self.cache.items(),
                     key=lambda kv: kv[1],
                     reverse=True,
