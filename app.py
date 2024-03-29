@@ -1,23 +1,17 @@
 import json
 from flask import Flask, request, render_template_string
-from util import setup_analytics_logger, get_latest_trie_pkl, get_index_html
+from util import setup_file_logger, get_latest_trie_pkl, get_index_html
 
 app = Flask(__name__)
-analytics_logger = setup_analytics_logger()
+analytics_logger = setup_file_logger("analytics", "query.log")
+
 HTML_FORM = get_index_html()
 AUTOCOMPLETE_TRIE = get_latest_trie_pkl()
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET"])
 def home():
-    query = None
-    if request.method == "POST":
-        query = request.form["query"]
-        analytics_logger.info(query)
-    return render_template_string(
-        HTML_FORM,
-        submission_text=f"Query submitted: {query}" if query else "",
-    )
+    return render_template_string(HTML_FORM)
 
 
 @app.route("/autocomplete", methods=["POST"])
@@ -30,8 +24,20 @@ def autocomplete():
     return json.dumps(suggestions)
 
 
+@app.route("/submit-query", methods=["POST"])
+def submit_query():
+    query = request.form["query"]
+    analytics_logger.info(query)
+    return "OK"
+
+
 @app.route("/load-trie", methods=["POST"])
 def load_trie():
     global AUTOCOMPLETE_TRIE
     AUTOCOMPLETE_TRIE = get_latest_trie_pkl()
+    return "OK"
+
+
+@app.route("/health", methods=["GET"])
+def health():
     return "OK"

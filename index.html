@@ -3,6 +3,23 @@
 <head>
     <title>Autocomplete</title>
     <script>
+        function onSubmit(event) {
+            event.preventDefault();
+            const form = document.querySelector('form');
+
+            // submit the query to the server
+            const formData = new FormData(form);
+                
+            fetch('/submit-query', {
+                method: 'POST',
+                body: formData
+            })
+            .catch(error => console.error('Fetch error:', error));
+
+            // show the query that was submitted
+            const query_viewer = document.getElementById('query-viewer');
+            query_viewer.innerHTML = `Submitted query: ${event.target.query.value}`;
+        }
 
         function setSuggestions(suggestions) {
             const dataList = document.getElementById('suggestions');
@@ -14,7 +31,7 @@
             });
         }
 
-        function sendPostRequest(value) {
+        function onFormChange(value) {
             fetch('/autocomplete', {
                 method: 'POST',
                 headers: {
@@ -30,20 +47,25 @@
         function setup() {
             const input = document.querySelector('input[name="query"]');
             input.addEventListener('input', (event) => {
-                sendPostRequest(event.target.value);
+                onFormChange(event.target.value);
             });
+            var form = document.querySelector('form');
+            form.addEventListener('submit', onSubmit);
         }
 
         window.onload = setup;
     </script>
 </head>
 <body>
-    <h2>Enter Something</h2>
-    <form method="post">
+    <h2>Autocomplete</h2>
+    <em>Autocompletions, ranked based on most frequently submitted queries</em>
+    <br/>
+    <br/>
+    <form method="post" action="/submit-query">
         <input type="text" name="query" list="suggestions" />
         <datalist id="suggestions"></datalist>
         <input type="submit" value="Submit" />
     </form>
-    <p>{{ submission_text }}</p>
+    <p id="query-viewer"></p>
 </body>
 </html>

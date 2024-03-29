@@ -4,14 +4,14 @@ import pickle
 
 from subgraph_cache_trie import SubgraphCacheNode
 
+LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
-def setup_analytics_logger() -> logging.Logger:
-    analytics_logger = logging.getLogger("analytics")
+
+def setup_file_logger(name: str, filename: str) -> logging.Logger:
+    analytics_logger = logging.getLogger(name)
     analytics_logger.setLevel(logging.INFO)
-    file_handler = logging.FileHandler("query.log")
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
+    file_handler = logging.FileHandler(filename)
+    formatter = logging.Formatter(LOG_FORMAT)
     file_handler.setFormatter(formatter)
     analytics_logger.addHandler(file_handler)
     return analytics_logger
@@ -22,9 +22,7 @@ def setup_console_logger(name: str) -> logging.Logger:
     logger.setLevel(logging.INFO)
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
+    formatter = logging.Formatter(LOG_FORMAT)
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
     return logger
