@@ -19,6 +19,6 @@ def add_stream_handler(logger: logging.Logger):
 
 
 def get_index_html() -> str:
-    with open("index.html", "r") as file:
+    with open("static/index.html", "r") as file:
         html = file.read()
     return html

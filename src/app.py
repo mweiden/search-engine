@@ -1,7 +1,7 @@
 import json
 import logging
 from flask import Flask, request, render_template_string
-from util import add_file_handler, add_stream_handler, get_index_html
+from util import add_file_handler, get_index_html
 from trie_storage import TrieStorage
 
 app = Flask(__name__)

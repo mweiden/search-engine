@@ -4,7 +4,9 @@ services:
   server:
     image: python:flask
     volumes:
-      - ${PWD}:/app
+      - ${PWD}/src:/app
+      - ${PWD}/logs:/app/logs
+      - ${PWD}/pickles:/app/pickles
     working_dir: /app
     ports:
       - "3000:3000"
@@ -19,7 +21,9 @@ services:
   log_reader:
     image: python:flask
     volumes:
-      - ${PWD}:/app
+      - ${PWD}/src:/app
+      - ${PWD}/logs:/app/logs
+      - ${PWD}/pickles:/app/pickles
     working_dir: /app
     depends_on:
       server:

@@ -44,5 +44,5 @@ pip3 install -r requirements.txt
 Run tests
 
 ```
-pytest
+pytest src/
 ```
