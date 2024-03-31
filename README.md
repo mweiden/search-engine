@@ -39,11 +39,11 @@ python -m venv .venv
 Install requirements
 
 ```
-pip3 install -r requirements.txt
+make install
 ```
 
 Run tests
 
 ```
-pytest src/
+make test
 ```
