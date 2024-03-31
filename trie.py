@@ -1,3 +1,5 @@
+from collections import deque
+
 from dataclasses import dataclass, field
 from typing import Dict, Any, Optional, Set
 
@@ -61,3 +63,15 @@ class Trie:
                 return None
             current_node = current_node[c]
         return current_node
+
+    def _bfs(self):
+        queue = deque([self.root])
+        visited = set([])
+
+        while queue:
+            current_node = queue.popleft()
+            visited.add(current_node)
+            queue.extend(
+                child for child in current_node.children if child not in visited
+            )
+            yield current_node

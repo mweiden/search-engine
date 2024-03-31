@@ -25,4 +25,4 @@ services:
       server:
         condition: service_healthy
     entrypoint: /bin/sh
-    command: -c 'while true; do python log_reader.py; sleep 30; done'
+    command: -c 'while true; do python log_reader_cron.py; sleep 30; done'

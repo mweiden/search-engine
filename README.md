@@ -46,7 +46,3 @@ Run tests
 ```
 pytest
 ```
-
-## TODO
-
-* `log_reader.py` uses the last trie pickle as a checkpoint and only loads the new logged queries
