@@ -12,7 +12,7 @@ def test_insert():
     assert t.root["a"]["l"].child_keys() == {"l"}
     assert t.root["a"]["n"].child_keys() == {"y"}
 
-    assert t.root["a"].value == None
+    assert t.root["a"].value is None
     assert t.root["a"]["l"]["l"].value == 1
     assert t.root["a"]["n"]["y"].value == 2
     assert t.root["a"]["n"].value == 3
@@ -22,10 +22,10 @@ def test_insert():
     assert t.root["a"]["l"]["l"].key == "all"
     assert t.root["a"]["n"]["y"].key == "any"
 
-    assert t.root["a"].is_terminal == False
-    assert t.root["a"]["n"].is_terminal == True
-    assert t.root["a"]["l"]["l"].is_terminal == True
-    assert t.root["a"]["n"]["y"].is_terminal == True
+    assert t.root["a"].is_terminal is False
+    assert t.root["a"]["n"].is_terminal is True
+    assert t.root["a"]["l"]["l"].is_terminal is True
+    assert t.root["a"]["n"]["y"].is_terminal is True
 
     assert t.root.parent is None
     assert t.root["a"].parent == t.root
@@ -55,7 +55,7 @@ def test_delete():
     assert t.find("all").value == 1
     assert t.find("any").value == 2
     assert t.find("an").value == 3
-    assert t.find("an").is_terminal == True
+    assert t.find("an").is_terminal is True
     # delete a leaf
     t.delete("all")
     assert t.find("all") is None
@@ -63,6 +63,6 @@ def test_delete():
     # delete an inner node
     t.delete("an")
     assert t.find("an") is not None
-    assert t.find("an").is_terminal == False
+    assert t.find("an").is_terminal is False
     # delete a non-existant key
     assert t.delete("some") is None

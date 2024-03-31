@@ -45,7 +45,7 @@ class Trie:
     def delete(self, key: str):
         def inner(node, key) -> Node:
             if key == "":
-                if node.is_terminal == True:
+                if node.is_terminal:
                     node.is_terminal = False
                     node.value = None
                 return node if len(node.children) > 0 else None
