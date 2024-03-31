@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.logger.setLevel(logging.INFO)
 
 analytics_logger = logging.Logger("analytics")
-add_file_handler(analytics_logger, "query.log")
+add_file_handler(analytics_logger, "logs/query.log")
 
 HTML_FORM = get_index_html()
 

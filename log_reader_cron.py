@@ -25,7 +25,7 @@ def _notify_server() -> int:
 
 
 if __name__ == "__main__":
-    log_reader = AnalyticsLogReader("query.log", "query_log_offset.txt")
+    log_reader = AnalyticsLogReader("logs/query.log", "logs/query_log_offset.txt")
     trie_storage = TrieStorage("pickles")
 
     # munge the log and generate counts for queries
