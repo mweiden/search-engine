@@ -1,6 +1,8 @@
 # Autocomplete
 [![Python package](https://github.com/mweiden/autocomplete/actions/workflows/python-package.yml/badge.svg)](https://github.com/mweiden/autocomplete/actions/workflows/python-package.yml)
 
+![](src/static/screenshot.png)
+
 Toy example of an autocomplete distributed system.
 
 Components:

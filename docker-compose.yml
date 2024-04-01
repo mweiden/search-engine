@@ -10,6 +10,9 @@ services:
     working_dir: /app
     ports:
       - "3000:3000"
+    depends_on:
+      redis:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 5s
@@ -17,6 +20,17 @@ services:
       retries: 3
     entrypoint: /bin/sh
     command: -c 'flask run -h 0.0.0.0 -p 3000'
+  
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
   log_reader:
     image: python:flask
