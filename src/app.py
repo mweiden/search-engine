@@ -22,10 +22,6 @@ AUTOCOMPLETE_TRIE = TRIE_STORAGE.get_latest_trie().trie
 MERMAID = Mermaid()
 
 
-def _notify_new_trie():
-    sse.publish({"event": "new trie!"}, type="content-updates")
-
-
 @app.route("/", methods=["GET"])
 def home():
     return render_template_string(HTML_FORM)
@@ -55,7 +51,8 @@ def load_trie():
     trie_blob = TRIE_STORAGE.get_latest_trie()
     AUTOCOMPLETE_TRIE = trie_blob.trie
     app.logger.info(f"Loaded new trie: {trie_blob.file_path}")
-    _notify_new_trie()
+    # notify clients to pull the new trie graph
+    sse.publish({"event": "new trie!"}, type="content-updates")
     return dict(status="OK")
 
 
