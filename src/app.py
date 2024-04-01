@@ -4,10 +4,11 @@ from flask import Flask, request, render_template_string
 from flask_sse import sse
 from util import add_file_handler, get_index_html
 from trie_storage import TrieStorage
+from mermaid import Mermaid
 
 app = Flask(__name__)
 app.config["REDIS_URL"] = "redis://redis"
-app.register_blueprint(sse, url_prefix='/stream')
+app.register_blueprint(sse, url_prefix="/stream")
 
 app.logger.setLevel(logging.INFO)
 
@@ -18,15 +19,16 @@ HTML_FORM = get_index_html()
 
 TRIE_STORAGE = TrieStorage("pickles")
 AUTOCOMPLETE_TRIE = TRIE_STORAGE.get_latest_trie().trie
+MERMAID = Mermaid()
 
 
 def _notify_new_trie():
-    sse.publish({"event": "new trie!"}, type='content-updates')
+    sse.publish({"event": "new trie!"}, type="content-updates")
 
 
 @app.route("/", methods=["GET"])
 def home():
-    return render_template_string(get_index_html())
+    return render_template_string(HTML_FORM)
 
 
 @app.route("/autocomplete", methods=["POST"])
@@ -59,9 +61,7 @@ def load_trie():
 
 @app.route("/trie-graph", methods=["GET"])
 def trie_graph():
-    return dict(
-        data=AUTOCOMPLETE_TRIE.mermaid_graph()
-    )
+    return dict(data=MERMAID.render_trie(AUTOCOMPLETE_TRIE))
 
 
 @app.route("/health", methods=["GET"])

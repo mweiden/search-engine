@@ -64,7 +64,7 @@ class Trie:
             current_node = current_node[c]
         return current_node
 
-    def _bfs(self):
+    def bfs(self):
         queue = deque([self.root])
         visited = set([])
 
@@ -72,28 +72,8 @@ class Trie:
             current_node = queue.popleft()
             visited.add(current_node.key)
             queue.extend(
-                child for _, child in current_node.children.items()
+                child
+                for _, child in current_node.children.items()
                 if child.key not in visited
             )
             yield current_node
-    
-    def mermaid_graph(self) -> str:
-        node_ids = {"": "n0", "counter": 0}
-        def _node_id(node: Node) -> str:
-            if node.key not in node_ids:
-                node_ids["counter"] += 1
-                node_ids[node.key] = f"n{node_ids["counter"]}"
-            return node_ids[node.key]
-        def _node_name(node: Node) -> str:
-            if node.key == "":
-                return " "
-            return node.key[-1]
-        mermaid_text = "graph TD\n"
-        # declare nodes
-        for node in self._bfs():
-            mermaid_text += f"\t{_node_id(node)}[{_node_name(node)}]\n"
-        for node in self._bfs():
-            if node.parent is None:
-                continue
-            mermaid_text += f"\t{_node_id(node.parent)} --> {_node_id(node)}\n"
-        return mermaid_text
