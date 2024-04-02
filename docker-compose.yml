@@ -27,10 +27,9 @@ services:
       - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
+      interval: 2s
+      timeout: 3s
       retries: 3
-      start_period: 5s
 
   log_reader:
     image: python:flask

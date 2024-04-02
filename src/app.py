@@ -2,7 +2,7 @@ import json
 import logging
 from flask import Flask, request, render_template_string
 from flask_sse import sse
-from util import add_file_handler, get_index_html
+from util import add_file_handler, get_static_file
 from trie_storage import TrieStorage
 from mermaid import Mermaid
 
@@ -15,7 +15,8 @@ app.logger.setLevel(logging.INFO)
 analytics_logger = logging.Logger("analytics")
 add_file_handler(analytics_logger, "logs/query.log")
 
-HTML_FORM = get_index_html()
+HTML_HOME = get_static_file("index.html")
+HTML_TRIE = get_static_file("trie.html")
 
 TRIE_STORAGE = TrieStorage("pickles")
 AUTOCOMPLETE_TRIE = TRIE_STORAGE.get_latest_trie().trie
@@ -24,7 +25,7 @@ MERMAID = Mermaid()
 
 @app.route("/", methods=["GET"])
 def home():
-    return render_template_string(HTML_FORM)
+    return render_template_string(HTML_HOME)
 
 
 @app.route("/autocomplete", methods=["POST"])
@@ -54,6 +55,11 @@ def load_trie():
     # notify clients to pull the new trie graph
     sse.publish({"event": "new trie!"}, type="content-updates")
     return dict(status="OK")
+
+
+@app.route("/trie", methods=["GET"])
+def trie():
+    return render_template_string(HTML_TRIE)
 
 
 @app.route("/trie-graph", methods=["GET"])

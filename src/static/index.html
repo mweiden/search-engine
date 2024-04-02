@@ -3,8 +3,6 @@
 <head>
     <title>Autocomplete</title>
     <script type="module">
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-
         function onSubmit(event) {
             event.preventDefault();
             const form = document.querySelector('form');
@@ -46,23 +44,6 @@
             .catch((error) => console.error('Error:', error));
         }
 
-        function refreshTrieGraph() {
-            fetch('/trie-graph', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-            .then(response => response.json())
-            .then(json => {
-                const trieViewer = document.getElementById('trie-viewer');
-                trieViewer.textContent = json.data;
-                trieViewer.removeAttribute('data-processed');
-                mermaid.init(undefined, trieViewer);
-                console.log("refreshed the trie viewer!")
-            });
-        }
-
         function setup() {
             // autocomplete on form change
             const input = document.querySelector('input[name="query"]');
@@ -73,16 +54,6 @@
             // form submission
             var form = document.querySelector('form');
             form.addEventListener('submit', onSubmit);
-
-            // render trie
-            mermaid.initialize({ startOnLoad: false, maxEdges: 5000 });
-            refreshTrieGraph();
-
-            // SSE for updating the trie dag graph
-            var source = new EventSource("{{ url_for('sse.stream') }}");
-            source.addEventListener('content-updates', function(event) {
-                refreshTrieGraph();
-            }, false);
         }
 
         window.onload = setup;
@@ -99,7 +70,6 @@
         <input type="submit" value="Submit" />
     </form>
     <p id="query-viewer"></p>
-    <p>Visualization of the autocomplete Trie:</p>
-    <pre class="mermaid" id="trie-viewer"></pre>
+    <a href="/trie">Trie visualization</a>
 </body>
 </html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Autocomplete</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+        function refreshTrieGraph() {
+            fetch('/trie-graph', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(json => {
+                const trieViewer = document.getElementById('trie-viewer');
+                trieViewer.textContent = json.data;
+                trieViewer.removeAttribute('data-processed');
+                mermaid.init(undefined, trieViewer);
+                console.log("refreshed the trie viewer!")
+            });
+        }
+
+        function setup() {
+            // render trie
+            mermaid.initialize({ startOnLoad: false, maxEdges: 10000 });
+            refreshTrieGraph();
+
+            // SSE for updating the trie dag graph
+            var source = new EventSource("{{ url_for('sse.stream') }}");
+            source.addEventListener('content-updates', function(event) {
+                refreshTrieGraph();
+            }, false);
+        }
+
+        window.onload = setup;
+    </script>
+</head>
+<body>
+    <p>Visualization of the autocomplete Trie:</p>
+    <pre class="mermaid" id="trie-viewer"></pre>
+</body>
+</html>
