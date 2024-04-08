@@ -3,7 +3,7 @@ import random
 import string
 from contextlib import contextmanager
 
-from log_reader import AnalyticsLogReader
+from autocomplete.log_reader import AnalyticsLogReader
 
 ANALYTICS_LOG_FIXTURE_SEG1 = """
 2024-03-29 03:56:49,205 - analytics - INFO - fireplace

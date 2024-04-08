@@ -1,4 +1,4 @@
-from subgraph_cache_trie import SubgraphCacheTrie
+from autocomplete.subgraph_cache_trie import SubgraphCacheTrie
 
 
 def test_insert():

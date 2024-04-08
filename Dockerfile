@@ -1,6 +1,6 @@
 FROM python:alpine
 
 WORKDIR /app
-
-RUN pip install Flask flask-sse
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
 RUN apk --no-cache add curl

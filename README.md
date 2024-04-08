@@ -1,13 +1,19 @@
-# Autocomplete
+# Search Engine
 [![Python package](https://github.com/mweiden/autocomplete/actions/workflows/python-package.yml/badge.svg)](https://github.com/mweiden/autocomplete/actions/workflows/python-package.yml)
 
-![](src/static/screenshot.png)
+![](src/static/demo.gif)
 
-Toy example of an autocomplete distributed system.
+This is a single-node toy/demonstration of a search engine distributed system.
 
 Components:
-1. A web server that serves a simple html page with text input box - on submit the query is logged to an analytics log
-1. A cron job that reads the analytics log and constructs a Trie with caching to serve autocomplete suggestions in the text box on the html page
+- Web Server
+  - serves a simple html page with search input text box
+  - on submit the query is logged to an analytics log and the top 10 search results ranked by TF-IDF are returned
+- Analytics cron job 
+  - reads the analytics log and constructs a Trie with caching to serve autocomplete suggestions
+- Web Crawler cron job
+  - Builds an Inverted Index from scraped web pages starting with [Hacker News](https://news.ycombinator.com) as a seed url
+
 
 ## Running
 
@@ -23,6 +29,7 @@ To run the application
 1. `docker-compose up`
 1. Open a browser to `localhost:3000`
 1. Start submitting queries
+1. If you want to refresh the search index, run `make inverted_index`
 
 Note: the autosuggest trie is refreshed every 30 seconds.
 
@@ -49,3 +56,7 @@ Run tests
 ```
 make test
 ```
+
+## TODO
+
+* Move the web crawler cron job to docker-compose: unfortunately Selenium web_driver is currently [not supported](https://github.com/SeleniumHQ/selenium/issues/12651#issuecomment-1734785707) in the docker environment, so you'll have refresh the index yourself

@@ -1,8 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Autocomplete</title>
+    <title>Search Engine</title>
     <script type="module">
+        function setSearchResults(searchResults) {
+            const resultsList = document.getElementById('search-results');
+            resultsList.innerHTML = '';
+
+            searchResults.forEach((result) => {
+                // Create a new <li> element
+                const li = document.createElement('li');
+                
+                // Create a new <a> element for the link
+                const a = document.createElement('a');
+                
+                // Set the text and href of the <a> element
+                a.textContent = result.title === "" ? result.url : result.title;
+                a.href = result.url;
+                
+                // Append the <a> element to the <li>
+                li.appendChild(a);
+                
+                // Append the <li> element to the <ol>
+                resultsList.appendChild(li);
+            });
+        }
+
         function onSubmit(event) {
             event.preventDefault();
             const form = document.querySelector('form');
@@ -10,15 +33,17 @@
             // submit the query to the server
             const formData = new FormData(form);
                 
-            fetch('/submit-query', {
+            fetch('/search', {
                 method: 'POST',
                 body: formData
             })
+            .then(response => response.json())
+            .then(searchResults => setSearchResults(searchResults))
             .catch(error => console.error('Fetch error:', error));
 
             // show the query that was submitted
             const query_viewer = document.getElementById('query-viewer');
-            query_viewer.innerHTML = `Submitted query: ${event.target.query.value}`;
+            query_viewer.innerHTML = `Submitted query: \"${event.target.query.value}\"<br/>Search results:`;
         }
 
         function setSuggestions(suggestions) {
@@ -60,16 +85,22 @@
     </script>
 </head>
 <body>
-    <h2>Autocomplete</h2>
-    <em>Autocompletions, ranked based on most frequently submitted queries</em>
-    <br/>
-    <br/>
-    <form method="post" action="/submit-query">
+    <h2>Search Engine</h2>
+    <em>
+        Features:
+        <ul>
+            <li>Search index is populated with <a href="https://news.ycombinator.com">Hacker News</a> as the seed URL</li>
+            <li>Search results based on top 10 TF-IDF query matches</li>
+            <li>Autocompletions ranked based on most frequently submitted queries; see <a href="/trie">trie visualization</a></li>
+        </ul>
+    </em>
+    Search!
+    <form>
         <input type="text" name="query" list="suggestions" />
         <datalist id="suggestions"></datalist>
         <input type="submit" value="Submit" />
     </form>
     <p id="query-viewer"></p>
-    <a href="/trie">Trie visualization</a>
+    <ol id="search-results"></ol>
 </body>
 </html>

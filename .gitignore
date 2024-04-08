@@ -2,4 +2,6 @@ __pycache__
 .pytest_cache
 .venv
 .vscode
+tags
+pickles
 *.pkl

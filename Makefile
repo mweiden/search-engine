@@ -1,6 +1,6 @@
 .PHONY: scaffold
 scaffold:
-	mkdir -p pickles
+	mkdir -p pickles/{autocomplete_tries,inverted_indexes}
 
 .PHONY: install
 install:
@@ -25,3 +25,8 @@ lint:
 .PHONY: test
 test:
 	pytest src/
+
+.PHONY: inverted_index
+inverted_index:
+	cd src && python web_crawler_cron.py
+	curl -i -XPOST localhost:3000/inverted-index/load

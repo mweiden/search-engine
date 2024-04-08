@@ -1,31 +1,48 @@
 import json
 import logging
+from dataclasses import asdict
 from flask import Flask, request, render_template_string
 from flask_sse import sse
-from util import add_file_handler, get_static_file
-from trie_storage import TrieStorage
-from mermaid import Mermaid
 
+from autocomplete.mermaid import Mermaid
+from autocomplete.subgraph_cache_trie import SubgraphCacheTrie
+from search.inverted_index import InvertedIndex
+from pickle_store import PickleStore
+from util import add_file_handler, get_static_file
+from env import (
+    TRIE_STORAGE_PATH,
+    QUERY_LOG_PATH,
+    REDIS_URL,
+    INVERTED_INDEX_STORAGE_PATH,
+)
+
+# Flask application config
 app = Flask(__name__)
-app.config["REDIS_URL"] = "redis://redis"
+app.config["REDIS_URL"] = REDIS_URL
 app.register_blueprint(sse, url_prefix="/stream")
 
+# logging config
 app.logger.setLevel(logging.INFO)
-
 analytics_logger = logging.Logger("analytics")
-add_file_handler(analytics_logger, "logs/query.log")
+add_file_handler(analytics_logger, QUERY_LOG_PATH)
 
+# static pages
 HTML_HOME = get_static_file("index.html")
 HTML_TRIE = get_static_file("trie.html")
 
-TRIE_STORAGE = TrieStorage("pickles")
-AUTOCOMPLETE_TRIE = TRIE_STORAGE.get_latest_trie().trie
+# inverted index config
+INVERTED_INDEX_STORAGE = PickleStore(INVERTED_INDEX_STORAGE_PATH)
+INVERTED_INDEX = INVERTED_INDEX_STORAGE.get_latest(InvertedIndex).artifact
+
+# autocomplete config
+TRIE_STORAGE = PickleStore(TRIE_STORAGE_PATH)
+AUTOCOMPLETE_TRIE = TRIE_STORAGE.get_latest(SubgraphCacheTrie).artifact
 MERMAID = Mermaid()
 
 
 @app.route("/", methods=["GET"])
 def home():
-    return render_template_string(HTML_HOME)
+    return render_template_string(get_static_file("index.html"))
 
 
 @app.route("/autocomplete", methods=["POST"])
@@ -38,22 +55,21 @@ def autocomplete():
     return suggestions
 
 
-@app.route("/submit-query", methods=["POST"])
-def submit_query():
+@app.route("/search", methods=["POST"])
+def search():
     query = request.form["query"]
     analytics_logger.info(query)
     app.logger.info(f"Received query: {query}")
-    return dict(status="OK")
+    search_results = INVERTED_INDEX.top_k_tf_idf(query)
+    return [asdict(result) for result in search_results]
 
 
-@app.route("/load-trie", methods=["POST"])
-def load_trie():
-    global AUTOCOMPLETE_TRIE
-    trie_blob = TRIE_STORAGE.get_latest_trie()
-    AUTOCOMPLETE_TRIE = trie_blob.trie
-    app.logger.info(f"Loaded new trie: {trie_blob.file_path}")
-    # notify clients to pull the new trie graph
-    sse.publish({"event": "new trie!"}, type="content-updates")
+@app.route("/inverted-index/load", methods=["POST"])
+def load_inverted_index():
+    global INVERTED_INDEX
+    inverted_index_blob = INVERTED_INDEX_STORAGE.get_latest(InvertedIndex)
+    INVERTED_INDEX = inverted_index_blob.artifact
+    app.logger.info(f"Loaded new inverted index: {inverted_index_blob.file_path}")
     return dict(status="OK")
 
 
@@ -62,7 +78,18 @@ def trie():
     return render_template_string(HTML_TRIE)
 
 
-@app.route("/trie-graph", methods=["GET"])
+@app.route("/trie/load", methods=["POST"])
+def load_trie():
+    global AUTOCOMPLETE_TRIE
+    trie_blob = TRIE_STORAGE.get_latest(SubgraphCacheTrie)
+    AUTOCOMPLETE_TRIE = trie_blob.artifact
+    app.logger.info(f"Loaded new trie: {trie_blob.file_path}")
+    # notify clients to pull the new trie graph
+    sse.publish({"event": "new trie!"}, type="content-updates")
+    return dict(status="OK")
+
+
+@app.route("/trie/graph", methods=["GET"])
 def trie_graph():
     return dict(data=MERMAID.render_trie(AUTOCOMPLETE_TRIE))
 

@@ -1,6 +1,7 @@
 import logging
+from urllib import request
 
-LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+LOG_FORMAT = "%(levelname)s:%(name)s:%(asctime)s - %(message)s"
 
 
 def add_file_handler(logger: logging.Logger, filename: str) -> logging.Logger:
@@ -10,15 +11,15 @@ def add_file_handler(logger: logging.Logger, filename: str) -> logging.Logger:
     logger.addHandler(file_handler)
 
 
-def add_stream_handler(logger: logging.Logger):
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.INFO)
-    formatter = logging.Formatter(LOG_FORMAT)
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-
-
 def get_static_file(filename: str) -> str:
     with open(f"static/{filename}", "r") as file:
         html = file.read()
     return html
+
+
+def notify_server(command: str) -> int:
+    assert command in set(["trie/load", "inverted-index/load"])
+    req = request.Request(f"http://server:3000/{command}", method="POST")
+    with request.urlopen(req) as response:
+        status_code = response.status
+    return status_code

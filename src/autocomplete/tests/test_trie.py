@@ -1,4 +1,4 @@
-from trie import Trie
+from autocomplete.trie import Trie
 
 
 def test_insert():

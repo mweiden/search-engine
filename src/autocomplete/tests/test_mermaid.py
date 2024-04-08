@@ -1,5 +1,5 @@
-from trie import Trie
-from mermaid import Mermaid
+from autocomplete.trie import Trie
+from autocomplete.mermaid import Mermaid
 
 
 def test_mermaid_graph():

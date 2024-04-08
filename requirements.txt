@@ -1,4 +1,6 @@
 flask>=3.0.2
 flask-sse
-pytest
-flake8
+selenium
+webdriver-manager
+validators
+nltk

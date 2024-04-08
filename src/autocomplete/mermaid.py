@@ -1,5 +1,5 @@
 from typing import Dict
-from trie import Node, Trie
+from autocomplete.trie import Node, Trie
 
 
 class Mermaid:

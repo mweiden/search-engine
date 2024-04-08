@@ -1,15 +1,15 @@
 import sys
 import logging
 from typing import Dict
-from urllib import request
 
-from subgraph_cache_trie import SubgraphCacheTrie
-from trie_storage import TrieStorage
-from log_reader import AnalyticsLogReader
-from util import add_stream_handler
+from autocomplete.subgraph_cache_trie import SubgraphCacheTrie
+from pickle_store import PickleStore
+from autocomplete.log_reader import AnalyticsLogReader
+from util import notify_server
+from env import QUERY_LOG_PATH, TRIE_STORAGE_PATH, QUERY_LOG_OFFSET_PATH
 
-logger = logging.Logger("log_reader")
-add_stream_handler(logger)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("log_reader")
 
 
 def _update_trie(trie: SubgraphCacheTrie, query_counts: Dict[str, int]):
@@ -17,16 +17,9 @@ def _update_trie(trie: SubgraphCacheTrie, query_counts: Dict[str, int]):
         trie.insert(key, count)
 
 
-def _notify_server() -> int:
-    req = request.Request("http://server:3000/load-trie", method="POST")
-    with request.urlopen(req) as response:
-        status_code = response.status
-    return status_code
-
-
 if __name__ == "__main__":
-    log_reader = AnalyticsLogReader("logs/query.log", "logs/query_log_offset.txt")
-    trie_storage = TrieStorage("pickles")
+    log_reader = AnalyticsLogReader(QUERY_LOG_PATH, QUERY_LOG_OFFSET_PATH)
+    trie_storage = PickleStore(TRIE_STORAGE_PATH)
 
     # munge the log and generate counts for queries
     query_counts = log_reader.unique_count()
@@ -38,7 +31,7 @@ if __name__ == "__main__":
         sys.exit(0)
 
     # build a trie with subgraph caching for fast access
-    pkld_trie = trie_storage.get_latest_trie().trie
+    pkld_trie = trie_storage.get_latest(SubgraphCacheTrie).artifact
     trie = pkld_trie if pkld_trie is not None else SubgraphCacheTrie()
     _update_trie(trie, query_counts)
     logger.info("SubgraphCacheTrie loaded.")
@@ -48,5 +41,5 @@ if __name__ == "__main__":
     logger.info(f"SubgraphCacheTrie saved to {pkl_file_name}")
 
     # tell the server to pick up the the new trie
-    status_code = _notify_server()
+    status_code = notify_server("trie/load")
     logger.info(f"Server response for loading {pkl_file_name}: {status_code}")
