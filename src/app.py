@@ -42,7 +42,7 @@ MERMAID = Mermaid()
 
 @app.route("/", methods=["GET"])
 def home():
-    return render_template_string(get_static_file("index.html"))
+    return render_template_string(HTML_HOME)
 
 
 @app.route("/autocomplete", methods=["POST"])
