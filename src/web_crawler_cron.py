@@ -4,6 +4,7 @@ import sys
 import time
 
 from selenium.common.exceptions import WebDriverException
+from urllib3.exceptions import MaxRetryError
 from web_crawler.web_scraper import WebScraper
 from web_crawler.node import Node
 
@@ -22,16 +23,6 @@ def seconds_since_program_start():
     return int(current_time - START_TIME)
 
 
-def async_timed(func):
-    async def wrapper(*args, **kwargs):
-        start_time = time.perf_counter()
-        result = await func(*args, **kwargs)
-        end_time = time.perf_counter()
-        return result, (end_time - start_time)
-
-    return wrapper
-
-
 async def worker(
     worker_id: int,
     inverted_index: InvertedIndex,
@@ -43,7 +34,6 @@ async def worker(
     logger = logging.getLogger(f"worker{worker_id}")
 
     scraper = WebScraper()
-    timed_navigate = async_timed(scraper.navigate)
 
     logger.info("Started worker.")
 
@@ -51,7 +41,7 @@ async def worker(
         try:
             node = await queue.get()
 
-            _, fetch_time = await timed_navigate(node.url)
+            fetch_time = await scraper.navigate(node.url)
             netloc_last_visited_at[node.netloc] = seconds_since_program_start()
 
             node.text = scraper.extract_rendered_text()
@@ -87,17 +77,16 @@ async def worker(
             queue.task_done()
             if queue.empty():
                 break
-        except WebDriverException as e:
-            msg = e.msg.replace("\n", " ")
-            logger.error(f"Failed to fetch error {msg} URL: {node.url}")
+        except (WebDriverException, MaxRetryError) as e:
+            logger.error(f"Failed to fetch error {e} URL: {node.url}")
             queue.task_done()
             if queue.empty():
                 break
 
 
 async def main():
-    max_depth = 1
-    num_workers = 12
+    max_depth = 3
+    num_workers = 32
     seed_url = "https://news.ycombinator.com"
 
     inverted_index = InvertedIndex()

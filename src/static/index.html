@@ -10,17 +10,17 @@
             searchResults.forEach((result) => {
                 // Create a new <li> element
                 const li = document.createElement('li');
-                
+
                 // Create a new <a> element for the link
                 const a = document.createElement('a');
-                
+
                 // Set the text and href of the <a> element
                 a.textContent = result.title === "" ? result.url : result.title;
                 a.href = result.url;
-                
+
                 // Append the <a> element to the <li>
                 li.appendChild(a);
-                
+
                 // Append the <li> element to the <ol>
                 resultsList.appendChild(li);
             });
@@ -32,7 +32,7 @@
 
             // submit the query to the server
             const formData = new FormData(form);
-                
+
             fetch('/search', {
                 method: 'POST',
                 body: formData

@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import time
 
 import validators
 from selenium.common.exceptions import StaleElementReferenceException
@@ -27,15 +28,18 @@ class WebScraper:
     #     self.driver.quit()
     #     self.driver = webdriver.Chrome(options=self.options)
 
-    async def navigate(self, target: str) -> None:
+    async def navigate(self, target: str) -> float:
         loop = asyncio.get_running_loop()
-        await loop.run_in_executor(None, self.navigate_sync, target)
+        return await loop.run_in_executor(None, self.navigate_sync, target)
 
-    def navigate_sync(self, target: str) -> None:
+    def navigate_sync(self, target: str) -> float:
         # if self.target is not None and target != self.target:
         #     self._refresh_driver()
+        start_time = time.perf_counter()
         self.target = target
         self.driver.get(target)
+        end_time = time.perf_counter()
+        return end_time - start_time
 
     def extract_raw_data(self) -> str:
         return self.driver.page_source
