@@ -14,7 +14,11 @@ from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 import string
 
+# NLTK 3.9 split tokenizer tables into a separate
+# resource named "punkt_tab". Download both for
+# compatibility across environments/CI.
 nltk.download("punkt", quiet=True)
+nltk.download("punkt_tab", quiet=True)
 nltk.download("stopwords", quiet=True)
 nltk.download("wordnet", quiet=True)
 
