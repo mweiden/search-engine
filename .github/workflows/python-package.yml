@@ -24,6 +24,14 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Cache NLTK data
+      uses: actions/cache@v4
+      with:
+        path: ~/nltk_data
+        key: ${{ runner.os }}-nltk-${{ matrix.python-version }}-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-nltk-${{ matrix.python-version }}-
+          ${{ runner.os }}-nltk-
     - name: Install dependencies
       run: make install
     - name: Lint with flake8
