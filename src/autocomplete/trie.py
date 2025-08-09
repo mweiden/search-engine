@@ -43,16 +43,20 @@ class Trie:
         return current_node
 
     def delete(self, key: str):
-        def inner(node, key) -> Node:
+        def inner(node, key) -> Optional[Node]:
             if key == "":
                 if node.is_terminal:
                     node.is_terminal = False
                     node.value = None
-                return node if len(node.children) > 0 else None
+                return node if node.children else None
             if key[0] not in node.children:
-                return None
-            node[key[0]] = inner(node[key[0]], key[1:])
-            return node
+                return node
+            child = inner(node[key[0]], key[1:])
+            if child is None:
+                del node.children[key[0]]
+            else:
+                node[key[0]] = child
+            return node if node.children or node.is_terminal else None
 
         inner(self.root, key)
 

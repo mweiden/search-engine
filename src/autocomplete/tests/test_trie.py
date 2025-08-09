@@ -58,10 +58,12 @@ def test_delete():
     assert t.find("an").is_terminal is True
     # delete a leaf
     t.delete("all")
+    assert t.root["a"].child_keys() == {"n"}
     assert t.find("all") is None
     assert t.find("any").value == 2
     # delete an inner node
     t.delete("an")
+    assert t.root["a"]["n"].child_keys() == {"y"}
     assert t.find("an") is not None
     assert t.find("an").is_terminal is False
     # delete a non-existant key
