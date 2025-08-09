@@ -9,6 +9,7 @@ def add_file_handler(logger: logging.Logger, filename: str) -> logging.Logger:
     formatter = logging.Formatter(LOG_FORMAT)
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
+    return logger
 
 
 def get_static_file(filename: str) -> str:
