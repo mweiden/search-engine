@@ -3,4 +3,5 @@ flask-sse
 selenium
 webdriver-manager
 validators
-nltk
+# Pin NLTK to stabilize tokenizer resources in CI
+nltk>=3.9,<4
