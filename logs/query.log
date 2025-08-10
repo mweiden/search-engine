@@ -1,140 +1,45 @@
-2024-03-27 21:07:33,568 - analytics - INFO - What's the deal?
-2024-03-27 21:09:37,666 - analytics - INFO - Charles
-2024-03-27 21:59:48,589 - analytics - INFO - test
-2024-03-29 03:54:36,374 - analytics - INFO - Goodnight Moon
-2024-03-29 03:54:52,030 - analytics - INFO - Let's Dance Little Pookie
-2024-03-29 03:55:12,515 - analytics - INFO - Llama Llama Red Pajama
-2024-03-29 03:55:26,287 - analytics - INFO - Happy Birthday, Little Pookie
-2024-03-29 03:55:38,749 - analytics - INFO - Spooky Pookie
-2024-03-29 03:55:44,392 - analytics - INFO - Big Red Barn
-2024-03-29 03:55:53,385 - analytics - INFO - Green Eggs and Ham
-2024-03-29 03:55:58,326 - analytics - INFO - Hop on Pop
-2024-03-29 03:56:15,778 - analytics - INFO - Llama Llama Time to Share
-2024-03-29 03:56:32,151 - analytics - INFO - We Are the Nerds
-2024-03-29 03:56:43,110 - analytics - INFO - Dinosnores
-2024-03-29 03:56:49,205 - analytics - INFO - fireplace
-2024-03-29 03:56:57,070 - analytics - INFO - floor
-2024-03-29 03:57:00,508 - analytics - INFO - garage
-2024-03-29 03:57:04,359 - analytics - INFO - kitchen
-2024-03-29 03:57:07,420 - analytics - INFO - door
-2024-03-29 03:57:11,594 - analytics - INFO - sink
-2024-03-29 03:57:14,953 - analytics - INFO - lights
-2024-03-29 03:57:18,743 - analytics - INFO - garage
-2024-03-29 03:57:35,614 - analytics - INFO - reddit
-2024-03-29 03:57:38,807 - analytics - INFO - facebook
-2024-03-29 03:57:41,210 - analytics - INFO - meta
-2024-03-29 03:57:46,980 - analytics - INFO - netflix
-2024-03-29 04:05:50,196 - analytics - INFO - netflix
-2024-03-29 04:20:46,727 - analytics - INFO - Yummy Yucky
-2024-03-29 04:21:00,186 - analytics - INFO - Jamberry
-2024-03-29 04:21:33,246 - analytics - INFO - There's a Bird on My Head
-2024-03-29 04:21:38,523 - analytics - INFO - television
-2024-03-29 04:21:42,149 - analytics - INFO - speaker
-2024-03-29 04:21:52,019 - analytics - INFO - How I Feel
-2024-03-29 04:22:00,922 - analytics - INFO - dinosaurs
-2024-03-29 04:22:05,407 - analytics - INFO - zebras
-2024-03-29 04:22:11,001 - analytics - INFO - dog
-2024-03-29 04:22:36,887 - analytics - INFO - doggies
-2024-03-29 04:26:44,914 - analytics - INFO - Dark Souls
-2024-03-29 04:26:51,992 - analytics - INFO - Zelda
-2024-03-29 04:26:58,500 - analytics - INFO - fireplace
-2024-03-29 04:27:02,957 - analytics - INFO - bricks
-2024-03-29 04:27:06,523 - analytics - INFO - databricks
-2024-03-29 04:27:11,338 - analytics - INFO - cruise
-2024-03-29 04:27:16,647 - analytics - INFO - elementary school
-2024-03-29 04:27:28,078 - analytics - INFO - lavender
-2024-03-29 04:38:34,349 - analytics - INFO - couch
-2024-03-29 04:38:45,843 - analytics - INFO - squishmallow
-2024-03-29 04:38:48,837 - analytics - INFO - costco
-2024-03-29 04:38:51,699 - analytics - INFO - safeway
-2024-03-29 04:38:55,200 - analytics - INFO - whole foods
-2024-03-29 04:39:13,043 - analytics - INFO - bookshelf
-2024-03-29 04:40:18,081 - analytics - INFO - cart
-2024-03-29 04:40:22,479 - analytics - INFO - truck
-2024-03-29 04:40:24,763 - analytics - INFO - car
-2024-03-29 04:40:35,770 - analytics - INFO - lamp
-2024-03-31 05:43:44,745 - analytics - INFO - Llama Llama Mad at Mama
-2024-03-31 05:45:36,534 - analytics - INFO - Llama Llama Zippity Zoom
-2024-03-31 05:45:49,631 - analytics - INFO - Llama Llama Time to Share
-2024-03-31 05:54:59,634 - analytics - INFO - Jamberry
-2024-03-31 05:55:23,009 - analytics - INFO - Someone Took my Ball
-2024-03-31 06:03:33,011 - analytics - INFO - Autocomplete
-2024-03-31 06:03:38,258 - analytics - INFO - autocomplete
-2024-03-31 06:05:19,673 - analytics - INFO - autocomplete
-2024-03-31 06:05:33,187 - analytics - INFO - pickle
-2024-03-31 06:05:34,682 - analytics - INFO - pickles
-2024-03-31 06:12:30,625 - analytics - INFO - autonomous
-2024-03-31 06:12:40,167 - analytics - INFO - automate
-2024-03-31 06:12:59,604 - analytics - INFO - automaton
-2024-03-31 06:29:57,878 - analytics - INFO - hoodie
-2024-03-31 06:30:02,470 - analytics - INFO - sweatshirt
-2024-03-31 06:30:07,191 - analytics - INFO - camisa
-2024-03-31 06:30:11,247 - analytics - INFO - hemd
-2024-03-31 20:29:40,204 - analytics - INFO - candle
-2024-03-31 20:29:46,398 - analytics - INFO - wax
-2024-03-31 20:30:00,676 - analytics - INFO - tablecloth
-2024-03-31 20:30:06,711 - analytics - INFO - notebook
-2024-03-31 22:29:07,312 - analytics - INFO - stuffed animal
-2024-04-01 04:41:28,888 - analytics - INFO - brix
-2024-04-01 04:42:31,703 - analytics - INFO - localhost
-2024-04-01 04:42:38,542 - analytics - INFO - browser
-2024-04-01 04:44:13,548 - analytics - INFO - baby
-2024-04-01 04:44:21,688 - analytics - INFO - babies
-2024-04-01 04:44:58,914 - analytics - INFO - text box
-2024-04-01 04:45:06,252 - analytics - INFO - bicycle
-2024-04-01 04:45:15,352 - analytics - INFO - subaru
-2024-04-01 04:46:04,672 - analytics - INFO - selfish
-2024-04-01 04:46:12,120 - analytics - INFO - diamond
-2024-04-01 04:46:20,101 - analytics - INFO - shellfish
-2024-04-01 04:46:24,604 - analytics - INFO - squid
-2024-04-01 04:47:39,836 - analytics - INFO - trie
-2024-04-01 04:49:14,300 - analytics - INFO - trie
-2024-04-01 05:32:34,707 - analytics - INFO - localhost
-2024-04-02 02:40:02,171 - analytics - INFO - test
-2024-04-02 02:42:55,637 - analytics - INFO - ruff
-2024-04-02 02:42:58,777 - analytics - INFO - rough
-2024-04-02 02:43:36,181 - analytics - INFO - Submit
-2024-04-02 02:43:38,816 - analytics - INFO - submit
-2024-04-10 03:02:23,285 - analytics - INFO - da
-2024-04-10 03:04:30,188 - analytics - INFO - new trie
-2024-04-10 03:06:43,233 - analytics - INFO - new trie
-2024-04-10 03:11:13,913 - analytics - INFO - test
-2024-04-10 03:19:58,433 - analytics - INFO - fangs
-2024-04-10 03:30:57,136 - analytics - INFO - fangs
-2024-04-10 03:33:06,026 - analytics - INFO - python code
-2024-04-10 03:35:45,073 - analytics - INFO - python code
-2024-04-10 03:36:30,110 - analytics - INFO - python
-2024-04-10 03:37:02,776 - analytics - INFO - python
-2024-04-10 03:37:29,815 - analytics - INFO - George Hotz
-2024-04-10 03:38:45,742 - analytics - INFO - Andrej
-2024-04-10 03:38:50,710 - analytics - INFO - Karpathy
-2024-04-10 03:39:12,098 - analytics - INFO - nytimes
-2024-04-10 03:39:16,415 - analytics - INFO - new york
-2024-04-10 03:39:59,760 - analytics - INFO - stack overflow
-2024-04-10 03:41:31,628 - analytics - INFO - mouse pad
-2024-04-10 04:01:10,202 - analytics - INFO - testing
-2024-04-10 04:01:21,755 - analytics - INFO - automation
-2024-04-10 04:01:26,367 - analytics - INFO - Cruise
-2024-04-10 04:02:37,109 - analytics - INFO - windows
-2024-04-10 04:02:43,300 - analytics - INFO - microsoft
-2024-04-10 04:02:50,870 - analytics - INFO - netflix
-INFO:analytics:2024-04-10 04:20:03,096 - github
-INFO:analytics:2024-04-10 04:58:11,069 - github
-INFO:analytics:2024-04-10 04:58:20,865 - Andrej
-INFO:analytics:2024-04-10 04:58:25,629 - Karpathy
-INFO:analytics:2024-04-10 04:58:33,002 - NVIDIA
-INFO:analytics:2024-04-10 05:08:40,132 - index
-INFO:analytics:2024-04-10 05:09:14,794 - RISC
-INFO:analytics:2024-04-10 05:09:21,069 - TSMC
-INFO:analytics:2024-04-10 05:09:24,594 - taiwan
-INFO:analytics:2024-04-10 05:09:37,093 - china
-INFO:analytics:2024-04-10 05:19:56,817 - transformers
-INFO:analytics:2024-04-10 05:20:02,357 - machine learning
-INFO:analytics:2024-04-10 05:20:58,190 - matt
-INFO:analytics:2024-04-10 05:21:04,925 - mathematics
-INFO:analytics:2024-04-10 05:21:22,456 - manual
-INFO:analytics:2024-04-10 05:21:32,110 - main
-INFO:analytics:2024-04-10 05:21:40,211 - matter
-INFO:analytics:2024-04-10 05:21:49,829 - machine intelligence
-INFO:analytics:2024-04-10 05:23:06,486 - machine learning
-INFO:analytics:2024-04-10 05:23:36,035 - machine learning
+INFO:analytics:2025-08-10 20:28:47,100 - ERJ175
+INFO:analytics:2025-08-10 20:29:34,437 - Where to next?
+INFO:analytics:2025-08-10 20:30:42,588 - machine learning
+INFO:analytics:2025-08-10 20:30:52,995 - natural history museum
+INFO:analytics:2025-08-10 20:31:03,693 - Framework Desktop
+INFO:analytics:2025-08-10 20:31:14,350 - user profile
+INFO:analytics:2025-08-10 20:31:21,128 - React
+INFO:analytics:2025-08-10 20:31:28,014 - React app
+INFO:analytics:2025-08-10 20:31:42,619 - Top Companies
+INFO:analytics:2025-08-10 20:31:52,207 - IEEE
+INFO:analytics:2025-08-10 20:32:08,064 - erlang
+INFO:analytics:2025-08-10 20:34:13,510 - distinct queries
+INFO:analytics:2025-08-10 20:35:47,658 - Show hacker News
+INFO:analytics:2025-08-10 20:36:00,845 - Show Hacker News
+INFO:analytics:2025-08-10 20:36:04,474 - Show
+INFO:analytics:2025-08-10 20:36:22,963 - Github
+INFO:analytics:2025-08-10 20:36:26,191 - GitHub
+INFO:analytics:2025-08-10 20:36:39,266 - Ampere
+INFO:analytics:2025-08-10 20:36:55,396 - Passenger
+INFO:analytics:2025-08-10 20:36:59,147 - Coffee
+INFO:analytics:2025-08-10 20:37:02,067 - Berlin
+INFO:analytics:2025-08-10 20:37:13,899 - logs
+INFO:analytics:2025-08-10 20:37:18,793 - apple
+INFO:analytics:2025-08-10 20:37:20,915 - beta
+INFO:analytics:2025-08-10 20:37:35,414 - canberra
+INFO:analytics:2025-08-10 20:37:38,618 - dog
+INFO:analytics:2025-08-10 20:37:42,159 - elephant
+INFO:analytics:2025-08-10 20:37:43,940 - fox
+INFO:analytics:2025-08-10 20:37:49,467 - giraffe
+INFO:analytics:2025-08-10 20:37:57,250 - horse
+INFO:analytics:2025-08-10 20:38:01,372 - iguana
+INFO:analytics:2025-08-10 20:38:20,180 - jail
+INFO:analytics:2025-08-10 20:38:30,944 - kite
+INFO:analytics:2025-08-10 20:38:59,471 - llama
+INFO:analytics:2025-08-10 20:39:13,421 - noodle
+INFO:analytics:2025-08-10 20:39:17,582 - chat
+INFO:analytics:2025-08-10 20:39:56,812 - top company articles
+INFO:analytics:2025-08-10 20:40:25,087 - oops
+INFO:analytics:2025-08-10 20:40:30,501 - polish
+INFO:analytics:2025-08-10 20:40:34,437 - quest
+INFO:analytics:2025-08-10 20:40:37,222 - ramble
+INFO:analytics:2025-08-10 20:40:39,719 - rover
+INFO:analytics:2025-08-10 20:40:45,440 - snack
+INFO:analytics:2025-08-10 20:40:48,753 - time
+INFO:analytics:2025-08-10 20:40:52,328 - ultimately
