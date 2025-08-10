@@ -95,10 +95,7 @@ def test_top_k_cosine(inverted_index, node0, node1):
 
 
 def test_paraphrase_minilm_model_simple_example():
-    try:
-        model = SentenceTransformer("sentence-transformers/paraphrase-MiniLM-L3-v2")
-    except (requests.exceptions.RequestException, OSError) as e:
-        pytest.skip(f"requires model download: {e}")
+    model = SentenceTransformer("sentence-transformers/paraphrase-MiniLM-L3-v2")
 
     index = InvertedIndex(model=model)
 
