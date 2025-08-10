@@ -26,8 +26,8 @@ class Node:
                 parsed_url.scheme,
                 parsed_url.netloc,
                 parsed_url.path,
-                parsed_url.query,
                 parsed_url.params,
+                "",  # No query
                 "",  # No fragment
             )
         )
