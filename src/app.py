@@ -60,7 +60,7 @@ def search():
     query = request.form["query"]
     analytics_logger.info(query)
     app.logger.info(f"Received query: {query}")
-    search_results = INVERTED_INDEX.top_k_tf_idf(query)
+    search_results = INVERTED_INDEX.top_k(query)
     return [asdict(result) for result in search_results]
 
 

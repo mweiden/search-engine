@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 
 from web_crawler.node import Node
@@ -32,7 +33,25 @@ def node1() -> Node:
 
 @pytest.fixture
 def inverted_index(node0, node1) -> InvertedIndex:
-    inverted_index = InvertedIndex()
+    class DummyModel:
+        KEYWORDS0 = {"lorem", "ipsum"}
+        KEYWORDS1 = {"type", "hint", "iterators", "iterator"}
+
+        def encode(self, text: str) -> np.ndarray:
+            tokens = text.lower().split()
+            vec = np.array(
+                [
+                    sum(t in self.KEYWORDS0 for t in tokens),
+                    sum(t in self.KEYWORDS1 for t in tokens),
+                ],
+                dtype=float,
+            )
+            if not vec.any():
+                vec = np.array([len(tokens), 0.0])
+            return vec
+
+    model = DummyModel()
+    inverted_index = InvertedIndex(model=model)
     inverted_index.insert(node0)
     inverted_index.insert(node1)
     return inverted_index
@@ -62,13 +81,9 @@ def test_num_words_in_doc(inverted_index, node0, node1):
     assert inverted_index.num_words_in_doc(node1.id) == len(node1_tokens)
 
 
-def test_top_k_tf_idf(inverted_index, node0, node1):
-    expected = [
-        SearchResult(node0.id, node0.url, node0.title, 0.1267494718585184),
-    ]
-    assert inverted_index.top_k_tf_idf("lorem ipsum") == expected
-    expected = [
-        SearchResult(node1.id, node1.url, node1.title, 0.2454477634937209),
-        SearchResult(node0.id, node0.url, node0.title, 0.0541067749263286),
-    ]
-    assert inverted_index.top_k_tf_idf("type hint iterators") == expected
+def test_top_k_cosine(inverted_index, node0, node1):
+    results = inverted_index.top_k("lorem ipsum")
+    assert results[0].id == node0.id
+
+    results = inverted_index.top_k("type hint iterators")
+    assert [r.id for r in results[:2]] == [node1.id, node0.id]

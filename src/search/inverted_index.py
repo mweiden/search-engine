@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
-from math import log10
 from collections import defaultdict
+
+import numpy as np
+from sentence_transformers import SentenceTransformer
 
 from web_crawler.node import Node
 from search.tokenizer import tokenize
@@ -11,16 +13,22 @@ class SearchResult:
     id: str
     url: str
     title: str | None = field(default=None)
-    tf_idf: float | None = field(default=None)
+    score: float | None = field(default=None)
 
 
 class InvertedIndex:
 
-    def __init__(self):
+    def __init__(
+        self,
+        model: SentenceTransformer | None = None,
+        model_name: str = "sentence-transformers/paraphrase-MiniLM-L3-v2",
+    ):
         self._inverted_index: dict[str, list[tuple[str, int]]] = defaultdict(list)
         self._words_per_doc: dict[str, int] = defaultdict(int)
         self._doc_id_to_url: dict[str, str] = dict()
         self._doc_id_to_title: dict[str, str] = dict()
+        self._doc_embeddings: dict[str, np.ndarray] = dict()
+        self._model = model if model is not None else SentenceTransformer(model_name)
 
     @property
     def total_docs(self):
@@ -33,6 +41,8 @@ class InvertedIndex:
         self._words_per_doc[doc.id] = total
         self._doc_id_to_url[doc.id] = doc.url
         self._doc_id_to_title[doc.id] = doc.title
+        if doc.text is not None:
+            self._doc_embeddings[doc.id] = self._model.encode(doc.text)
 
     def _word_count(self, text: str) -> dict[str, int]:
         counts = defaultdict(int)
@@ -53,7 +63,7 @@ class InvertedIndex:
                 id=kv[0],
                 url=self._doc_id_to_url[kv[0]],
                 title=self._doc_id_to_title[kv[0]],
-                tf_idf=None,
+                score=None,
             )
             for kv in self._search(word)
         ]
@@ -61,24 +71,24 @@ class InvertedIndex:
     def num_words_in_doc(self, doc_id: str) -> int:
         return self._words_per_doc[doc_id]
 
-    def top_k_tf_idf(self, query: str, k: int = 10) -> list[SearchResult]:
-        query_tokens = tokenize(query)
-        tf_idf = defaultdict(float)
-        for word in query_tokens:
-            results = self._search(word)
-            for doc_id, count in results:
-                doc_total = self.num_words_in_doc(doc_id)
-
-                tf = count / float(doc_total)
-                idf = log10(self.total_docs / (1.0 + len(results)))
-                tf_idf[doc_id] += tf * idf
+    def top_k(self, query: str, k: int = 10) -> list[SearchResult]:
+        query_embedding = self._model.encode(query)
+        scores: dict[str, float] = {}
+        for doc_id, embedding in self._doc_embeddings.items():
+            similarity = float(
+                np.dot(query_embedding, embedding)
+                / (np.linalg.norm(query_embedding) * np.linalg.norm(embedding))
+            )
+            scores[doc_id] = similarity
 
         return [
             SearchResult(
-                id=kv[0],
-                url=self._doc_id_to_url[kv[0]],
-                title=self._doc_id_to_title[kv[0]],
-                tf_idf=kv[1],
+                id=doc_id,
+                url=self._doc_id_to_url[doc_id],
+                title=self._doc_id_to_title[doc_id],
+                score=score,
             )
-            for kv in sorted(tf_idf.items(), reverse=True, key=lambda kv: kv[1])[:k]
+            for doc_id, score in sorted(
+                scores.items(), key=lambda kv: kv[1], reverse=True
+            )[:k]
         ]
