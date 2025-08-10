@@ -46,11 +46,14 @@ def inverted_index(node0, node1) -> InvertedIndex:
                     sum(t in self.KEYWORDS0 for t in tokens),
                     sum(t in self.KEYWORDS1 for t in tokens),
                 ],
-                dtype=float,
+                dtype=np.float32,
             )
             if not vec.any():
-                vec = np.array([len(tokens), 0.0])
+                vec = np.array([len(tokens), 0.0], dtype=np.float32)
             return vec
+
+        def get_sentence_embedding_dimension(self) -> int:
+            return 2
 
     model = DummyModel()
     inverted_index = InvertedIndex(model=model)

@@ -8,7 +8,7 @@ This is a single-node toy/demonstration of a search engine distributed system.
 Components:
 - Web Server
   - serves a simple html page with search input text box
-  - on submit the query is logged to an analytics log and the top 10 search results ranked by TF-IDF are returned
+  - on submit the query is logged to an analytics log and the top 10 search results ranked by cosine similarity over BERT embeddings are returned using an HNSW index for efficiency
 - Analytics cron job 
   - reads the analytics log and constructs a Trie with caching to serve autocomplete suggestions
 - Web Crawler cron job
