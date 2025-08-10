@@ -40,6 +40,6 @@ if __name__ == "__main__":
     pkl_file_name = trie_storage.save(trie)
     logger.info(f"SubgraphCacheTrie saved to {pkl_file_name}")
 
-    # tell the server to pick up the the new trie
+    # tell the server to pick up the new trie
     status_code = notify_server("trie/load")
     logger.info(f"Server response for loading {pkl_file_name}: {status_code}")
