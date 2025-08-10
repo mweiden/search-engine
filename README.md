@@ -37,12 +37,13 @@ Note: the autosuggest trie is refreshed every 30 seconds.
 
 Prerequisites for developing:
 
-* Python/Pip
+* Python 3.13 / Pip
 
 Create a virtual environment
 
 ```
 python -m venv .venv
+source .venv/bin/activate
 ```
 
 Install requirements
