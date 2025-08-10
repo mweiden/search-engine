@@ -1,6 +1,9 @@
 from dataclasses import dataclass, field
-from math import log10
 from collections import defaultdict
+
+import hnswlib
+import numpy as np
+from sentence_transformers import SentenceTransformer
 
 from web_crawler.node import Node
 from search.tokenizer import tokenize
@@ -11,16 +14,27 @@ class SearchResult:
     id: str
     url: str
     title: str | None = field(default=None)
-    tf_idf: float | None = field(default=None)
+    score: float | None = field(default=None)
 
 
 class InvertedIndex:
 
-    def __init__(self):
+    def __init__(
+        self,
+        model: SentenceTransformer | None = None,
+        model_name: str = "sentence-transformers/paraphrase-MiniLM-L3-v2",
+    ):
         self._inverted_index: dict[str, list[tuple[str, int]]] = defaultdict(list)
         self._words_per_doc: dict[str, int] = defaultdict(int)
         self._doc_id_to_url: dict[str, str] = dict()
         self._doc_id_to_title: dict[str, str] = dict()
+        self._model = model if model is not None else SentenceTransformer(model_name)
+        embedding_dim = self._model.get_sentence_embedding_dimension()
+        self._hnsw = hnswlib.Index(space="cosine", dim=embedding_dim)
+        self._hnsw.init_index(max_elements=100_000, ef_construction=200, M=16)
+        self._id_to_label: dict[str, int] = {}
+        self._label_to_id: dict[int, str] = {}
+        self._next_label = 0
 
     @property
     def total_docs(self):
@@ -33,6 +47,14 @@ class InvertedIndex:
         self._words_per_doc[doc.id] = total
         self._doc_id_to_url[doc.id] = doc.url
         self._doc_id_to_title[doc.id] = doc.title
+        if doc.text is not None:
+            embedding = self._model.encode(doc.text).astype(np.float32)
+            if self._next_label >= self._hnsw.get_max_elements():
+                self._hnsw.resize_index(self._next_label * 2)
+            self._hnsw.add_items(embedding, self._next_label)
+            self._id_to_label[doc.id] = self._next_label
+            self._label_to_id[self._next_label] = doc.id
+            self._next_label += 1
 
     def _word_count(self, text: str) -> dict[str, int]:
         counts = defaultdict(int)
@@ -53,7 +75,7 @@ class InvertedIndex:
                 id=kv[0],
                 url=self._doc_id_to_url[kv[0]],
                 title=self._doc_id_to_title[kv[0]],
-                tf_idf=None,
+                score=None,
             )
             for kv in self._search(word)
         ]
@@ -61,24 +83,23 @@ class InvertedIndex:
     def num_words_in_doc(self, doc_id: str) -> int:
         return self._words_per_doc[doc_id]
 
-    def top_k_tf_idf(self, query: str, k: int = 10) -> list[SearchResult]:
-        query_tokens = tokenize(query)
-        tf_idf = defaultdict(float)
-        for word in query_tokens:
-            results = self._search(word)
-            for doc_id, count in results:
-                doc_total = self.num_words_in_doc(doc_id)
-
-                tf = count / float(doc_total)
-                idf = log10(self.total_docs / (1.0 + len(results)))
-                tf_idf[doc_id] += tf * idf
-
-        return [
-            SearchResult(
-                id=kv[0],
-                url=self._doc_id_to_url[kv[0]],
-                title=self._doc_id_to_title[kv[0]],
-                tf_idf=kv[1],
+    def top_k(self, query: str, k: int = 10) -> list[SearchResult]:
+        if self._next_label == 0:
+            return []
+        k = min(k, self._next_label)
+        query_embedding = self._model.encode(query).astype(np.float32)
+        self._hnsw.set_ef(max(k, 10))
+        labels, distances = self._hnsw.knn_query(query_embedding, k)
+        results = []
+        for label, distance in zip(labels[0], distances[0]):
+            doc_id = self._label_to_id[label]
+            score = 1.0 - float(distance)
+            results.append(
+                SearchResult(
+                    id=doc_id,
+                    url=self._doc_id_to_url[doc_id],
+                    title=self._doc_id_to_title[doc_id],
+                    score=score,
+                )
             )
-            for kv in sorted(tf_idf.items(), reverse=True, key=lambda kv: kv[1])[:k]
-        ]
+        return results

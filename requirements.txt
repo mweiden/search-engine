@@ -5,3 +5,5 @@ webdriver-manager
 validators
 # Pin NLTK to stabilize tokenizer resources in CI
 nltk>=3.9,<4
+sentence-transformers
+hnswlib
