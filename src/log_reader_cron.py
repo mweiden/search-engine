@@ -31,8 +31,10 @@ if __name__ == "__main__":
         sys.exit(0)
 
     # build a trie with subgraph caching for fast access
-    pkld_trie = trie_storage.get_latest(SubgraphCacheTrie).artifact
-    trie = pkld_trie if pkld_trie is not None else SubgraphCacheTrie()
+    pkld_trie = trie_storage.get_latest(SubgraphCacheTrie)
+    trie = (
+        pkld_trie.artifact if pkld_trie and pkld_trie.artifact else SubgraphCacheTrie()
+    )
     _update_trie(trie, query_counts)
     logger.info("SubgraphCacheTrie loaded.")
 
