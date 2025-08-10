@@ -1,4 +1,4 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# This workflow installs dependencies, runs tests, and lints the codebase
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
 name: Python package
@@ -13,27 +13,33 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.11", "3.12"]
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v3
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: "3.13"
     - name: Cache NLTK data
       uses: actions/cache@v4
       with:
         path: ~/nltk_data
-        key: ${{ runner.os }}-nltk-${{ matrix.python-version }}-${{ hashFiles('requirements.txt') }}
+        key: ${{ runner.os }}-nltk-3.13-${{ hashFiles('requirements.txt') }}
         restore-keys: |
-          ${{ runner.os }}-nltk-${{ matrix.python-version }}-
+          ${{ runner.os }}-nltk-3.13-
           ${{ runner.os }}-nltk-
+    - name: Cache sentence-transformers model
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/torch/sentence_transformers
+        key: ${{ runner.os }}-st-3.13-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-st-3.13-
+          ${{ runner.os }}-st-
     - name: Install dependencies
       run: make install
+    - name: Download sentence-transformer model
+      run: python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/paraphrase-MiniLM-L3-v2')"
     - name: Lint with flake8
       run: make lint
     - name: Test with pytest
