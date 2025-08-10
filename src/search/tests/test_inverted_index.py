@@ -1,5 +1,7 @@
 import numpy as np
 import pytest
+import requests
+from sentence_transformers import SentenceTransformer
 
 from web_crawler.node import Node
 from search.inverted_index import InvertedIndex, SearchResult
@@ -87,3 +89,31 @@ def test_top_k_cosine(inverted_index, node0, node1):
 
     results = inverted_index.top_k("type hint iterators")
     assert [r.id for r in results[:2]] == [node1.id, node0.id]
+
+
+def test_paraphrase_minilm_model_simple_example():
+    try:
+        model = SentenceTransformer("sentence-transformers/paraphrase-MiniLM-L3-v2")
+    except (requests.exceptions.RequestException, OSError) as e:
+        pytest.skip(f"requires model download: {e}")
+
+    index = InvertedIndex(model=model)
+
+    sky = Node(
+        raw_url="https://example.com/sky",
+        text="The sky is blue.",
+        title="sky",
+    )
+    car = Node(
+        raw_url="https://example.com/car",
+        text="Driving my car is fun.",
+        title="car",
+    )
+    index.insert(sky)
+    index.insert(car)
+
+    results = index.top_k("blue sky")
+    assert results[0].id == sky.id
+
+    results = index.top_k("my car")
+    assert results[0].id == car.id
