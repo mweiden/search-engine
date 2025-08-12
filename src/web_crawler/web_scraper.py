@@ -1,9 +1,11 @@
 import asyncio
 import logging
 import time
+from ipaddress import ip_address
+from urllib.parse import urlparse
 
 import validators
-from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -13,15 +15,32 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+def is_local_url(url: str) -> bool:
+    host = urlparse(url).hostname
+    if host is None:
+        return True
+    if host == "localhost":
+        return True
+    try:
+        ip = ip_address(host)
+        return ip.is_loopback or ip.is_private
+    except ValueError:
+        return False
+
+
 class WebScraper:
     # Modified from https://www.webscrapingapi.com/python-headless-browser
 
     def __init__(self) -> None:
         self.options = Options()
         self.options.add_argument("--headless")
+        self.options.add_argument("--mute-audio")
+        self.options.add_argument("--no-sandbox")
+        self.options.add_argument("--disable-dev-shm-usage")
         prefs = {"download.default_directory": "/tmp/"}
         self.options.add_experimental_option("prefs", prefs)
         self.driver = webdriver.Chrome(options=self.options)
+        self.driver.set_page_load_timeout(15)
         self.target = None
 
     # def _refresh_driver(self) -> None:
@@ -37,7 +56,10 @@ class WebScraper:
         #     self._refresh_driver()
         start_time = time.perf_counter()
         self.target = target
-        self.driver.get(target)
+        try:
+            self.driver.get(target)
+        except TimeoutException:
+            logger.warning(f"Timeout fetching {target}")
         end_time = time.perf_counter()
         return end_time - start_time
 
@@ -66,4 +88,9 @@ class WebScraper:
                     links.append(href)
             except StaleElementReferenceException:
                 logger.info(f"Stale reference exception: {self.target}")
-        return set(link for link in links if validators.url(link))
+        return set(
+            link for link in links if validators.url(link) and not is_local_url(link)
+        )
+
+    def close(self) -> None:
+        self.driver.quit()

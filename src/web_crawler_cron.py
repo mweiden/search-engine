@@ -1,11 +1,11 @@
-import logging
 import asyncio
+import logging
 import sys
 import time
 
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import WebDriverException, TimeoutException
 from urllib3.exceptions import MaxRetryError
-from web_crawler.web_scraper import WebScraper
+from web_crawler.web_scraper import WebScraper, is_local_url
 from web_crawler.node import Node
 
 from search.inverted_index import InvertedIndex
@@ -37,51 +37,56 @@ async def worker(
 
     logger.info("Started worker.")
 
-    while True:
-        try:
-            node = await queue.get()
+    try:
+        while True:
+            try:
+                node = await queue.get()
 
-            fetch_time = await scraper.navigate(node.url)
-            netloc_last_visited_at[node.netloc] = seconds_since_program_start()
+                if is_local_url(node.url):
+                    logger.info(f"Skipping local URL {node.url}")
+                    queue.task_done()
+                    continue
 
-            node.text = scraper.extract_rendered_text()
-            node.title = scraper.driver.title
+                fetch_time = await scraper.navigate(node.url)
+                netloc_last_visited_at[node.netloc] = seconds_since_program_start()
 
-            inverted_index.insert(node)
+                node.text = scraper.extract_rendered_text()
+                node.title = scraper.driver.title
 
-            links = scraper.find_all_links()
+                inverted_index.insert(node)
 
-            if (node.depth + 1) <= max_depth:
-                for link in links:
-                    link_node = Node(link, node.depth + 1)
-                    # we prefer net locations we haven't seen before to avoid rate limiting
-                    if netloc_last_visited_at.get(link_node.netloc) is not None:
-                        # prioritize longer time since last visit; mult by -1 since PriorityQueue prioritizes lower numbers
-                        link_node.priority = -1 * (
-                            time.perf_counter()
-                            - netloc_last_visited_at[link_node.netloc]
-                        )
-                    if link_node.url in visited:
-                        continue
-                    visited.add(link_node.url)
-                    await queue.put(link_node)
+                links = scraper.find_all_links()
 
-            logger.info(
-                f"index_bytes={sys.getsizeof(inverted_index._inverted_index)} "
-                f"queue_size={queue.qsize()} "
-                f"depth={node.depth} "
-                f"priority={node.priority} "
-                f"fetch_time={round(fetch_time, 4)}s "
-                f"url={node.url}"
-            )
-            queue.task_done()
-            if queue.empty():
-                break
-        except (WebDriverException, MaxRetryError) as e:
-            logger.error(f"Failed to fetch error {e} URL: {node.url}")
-            queue.task_done()
-            if queue.empty():
-                break
+                if (node.depth + 1) <= max_depth:
+                    for link in links:
+                        link_node = Node(link, node.depth + 1)
+                        if is_local_url(link_node.url):
+                            continue
+                        # we prefer net locations we haven't seen before to avoid rate limiting
+                        if netloc_last_visited_at.get(link_node.netloc) is not None:
+                            link_node.priority = -1 * (
+                                time.perf_counter()
+                                - netloc_last_visited_at[link_node.netloc]
+                            )
+                        if link_node.url in visited:
+                            continue
+                        visited.add(link_node.url)
+                        await queue.put(link_node)
+
+                logger.info(
+                    f"index_bytes={sys.getsizeof(inverted_index._inverted_index)} "
+                    f"queue_size={queue.qsize()} "
+                    f"depth={node.depth} "
+                    f"priority={node.priority} "
+                    f"fetch_time={round(fetch_time, 4)}s "
+                    f"url={node.url}"
+                )
+                queue.task_done()
+            except (WebDriverException, MaxRetryError, TimeoutException) as e:
+                logger.error(f"Failed to fetch error {e} URL: {node.url}")
+                queue.task_done()
+    finally:
+        scraper.close()
 
 
 async def main():
