@@ -1,106 +1,140 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Search Engine</title>
-    <script type="module">
-        function setSearchResults(searchResults) {
-            const resultsList = document.getElementById('search-results');
-            resultsList.innerHTML = '';
+  <title>Noodle</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff;
+      color: #202124;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    #logo {
+      font-size: 80px;
+      margin-bottom: 20px;
+    }
+    #logo span:nth-child(1) { color: #4285F4; }
+    #logo span:nth-child(2) { color: #EA4335; }
+    #logo span:nth-child(3) { color: #FBBC05; }
+    #logo span:nth-child(4) { color: #4285F4; }
+    #logo span:nth-child(5) { color: #34A853; }
+    #logo span:nth-child(6) { color: #EA4335; }
+    form {
+      display: flex;
+      width: 100%;
+      max-width: 500px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 10px 15px;
+      border: 1px solid #dfe1e5;
+      border-radius: 24px;
+      box-shadow: none;
+      font-size: 16px;
+      outline: none;
+    }
+    input[type="text"]:focus {
+      box-shadow: 0 1px 6px rgba(32,33,36,0.28);
+      border-color: rgba(223,225,229,0);
+    }
+    input[type="submit"] {
+      margin-left: 8px;
+      padding: 0 16px;
+      border: none;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      color: #3c4043;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    #search-results {
+      margin-top: 20px;
+      max-width: 600px;
+    }
+  </style>
+  <script type="module">
+    function setSearchResults(searchResults) {
+      const resultsList = document.getElementById('search-results');
+      resultsList.innerHTML = '';
 
-            searchResults.forEach((result) => {
-                // Create a new <li> element
-                const li = document.createElement('li');
+      searchResults.forEach((result) => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.textContent = result.title === "" ? result.url : result.title;
+        a.href = result.url;
+        li.appendChild(a);
+        resultsList.appendChild(li);
+      });
+    }
 
-                // Create a new <a> element for the link
-                const a = document.createElement('a');
+    function onSubmit(event) {
+      event.preventDefault();
+      const form = document.querySelector('form');
+      const formData = new FormData(form);
 
-                // Set the text and href of the <a> element
-                a.textContent = result.title === "" ? result.url : result.title;
-                a.href = result.url;
+      fetch('/search', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(searchResults => setSearchResults(searchResults))
+      .catch(error => console.error('Fetch error:', error));
 
-                // Append the <a> element to the <li>
-                li.appendChild(a);
+      const query_viewer = document.getElementById('query-viewer');
+      query_viewer.innerHTML = `Submitted query: \"${event.target.query.value}\"<br/>Search results:`;
+    }
 
-                // Append the <li> element to the <ol>
-                resultsList.appendChild(li);
-            });
-        }
+    function setSuggestions(suggestions) {
+      const dataList = document.getElementById('suggestions');
+      dataList.innerHTML = '';
+      suggestions.forEach((item) => {
+        const option = document.createElement('option');
+        option.value = item;
+        dataList.appendChild(option);
+      });
+    }
 
-        function onSubmit(event) {
-            event.preventDefault();
-            const form = document.querySelector('form');
+    function onFormChange(value) {
+      fetch('/autocomplete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query: value }),
+      })
+      .then(response => response.json())
+      .then(suggestions => setSuggestions(suggestions))
+      .catch((error) => console.error('Error:', error));
+    }
 
-            // submit the query to the server
-            const formData = new FormData(form);
+    function setup() {
+      const input = document.querySelector('input[name="query"]');
+      input.addEventListener('input', (event) => {
+        onFormChange(event.target.value);
+      });
 
-            fetch('/search', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(searchResults => setSearchResults(searchResults))
-            .catch(error => console.error('Fetch error:', error));
+      const form = document.querySelector('form');
+      form.addEventListener('submit', onSubmit);
+    }
 
-            // show the query that was submitted
-            const query_viewer = document.getElementById('query-viewer');
-            query_viewer.innerHTML = `Submitted query: \"${event.target.query.value}\"<br/>Search results:`;
-        }
-
-        function setSuggestions(suggestions) {
-            const dataList = document.getElementById('suggestions');
-            dataList.innerHTML = '';
-            suggestions.forEach((item) => {
-                const option = document.createElement('option');
-                option.value = item;
-                dataList.appendChild(option);
-            });
-        }
-
-        function onFormChange(value) {
-            fetch('/autocomplete', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ query: value }),
-            })
-            .then(response => response.json())
-            .then(suggestions => setSuggestions(suggestions))
-            .catch((error) => console.error('Error:', error));
-        }
-
-        function setup() {
-            // autocomplete on form change
-            const input = document.querySelector('input[name="query"]');
-            input.addEventListener('input', (event) => {
-                onFormChange(event.target.value);
-            });
-
-            // form submission
-            var form = document.querySelector('form');
-            form.addEventListener('submit', onSubmit);
-        }
-
-        window.onload = setup;
-    </script>
+    window.onload = setup;
+  </script>
 </head>
 <body>
-    <h2>Search Engine</h2>
-    <em>
-        Features:
-        <ul>
-            <li>Search index is populated with <a href="https://news.ycombinator.com">Hacker News</a> as the seed URL</li>
-            <li>Search results based on top 10 TF-IDF query matches</li>
-            <li>Autocompletions ranked based on most frequently submitted queries; see <a href="/trie">trie visualization</a></li>
-        </ul>
-    </em>
-    Search!
-    <form>
-        <input type="text" name="query" list="suggestions" />
-        <datalist id="suggestions"></datalist>
-        <input type="submit" value="Submit" />
-    </form>
-    <p id="query-viewer"></p>
-    <ol id="search-results"></ol>
+  <div id="logo">
+    <span>n</span><span>o</span><span>o</span><span>d</span><span>l</span><span>e</span>
+  </div>
+  <form>
+    <input type="text" name="query" list="suggestions" />
+    <datalist id="suggestions"></datalist>
+    <input type="submit" value="Noodle Search" />
+  </form>
+  <p id="query-viewer"></p>
+  <ol id="search-results"></ol>
 </body>
 </html>
