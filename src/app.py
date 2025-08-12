@@ -36,7 +36,10 @@ INVERTED_INDEX = INVERTED_INDEX_STORAGE.get_latest(InvertedIndex).artifact
 
 # autocomplete config
 TRIE_STORAGE = PickleStore(TRIE_STORAGE_PATH)
-AUTOCOMPLETE_TRIE = TRIE_STORAGE.get_latest(SubgraphCacheTrie).artifact
+try:
+    AUTOCOMPLETE_TRIE = TRIE_STORAGE.get_latest(SubgraphCacheTrie).artifact
+except AttributeError as e:
+    AUTOCOMPLETE_TRIE = SubgraphCacheTrie()
 MERMAID = Mermaid()
 
 

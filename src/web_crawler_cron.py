@@ -85,7 +85,7 @@ async def worker(
 
 
 async def main():
-    max_depth = 3
+    max_depth = 2
     num_workers = 32
     seed_url = "https://news.ycombinator.com"
 
