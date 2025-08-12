@@ -4,7 +4,7 @@ import sys
 import time
 
 from selenium.common.exceptions import WebDriverException, TimeoutException
-from urllib3.exceptions import MaxRetryError
+from urllib3.exceptions import MaxRetryError, ReadTimeoutError
 from web_crawler.web_scraper import WebScraper
 from web_crawler.node import Node
 
@@ -39,9 +39,8 @@ async def worker(
 
     try:
         while True:
+            node = await queue.get()
             try:
-                node = await queue.get()
-
                 fetch_time = await scraper.navigate(node.url)
                 netloc_last_visited_at[node.netloc] = seconds_since_program_start()
 
@@ -75,11 +74,14 @@ async def worker(
                     f"fetch_time={round(fetch_time, 4)}s "
                     f"url={node.url}"
                 )
-                queue.task_done()
-                if queue.empty():
-                    break
-            except (WebDriverException, MaxRetryError, TimeoutException) as e:
+            except (
+                WebDriverException,
+                MaxRetryError,
+                TimeoutException,
+                ReadTimeoutError,
+            ) as e:
                 logger.error(f"Failed to fetch error {e} URL: {node.url}")
+            finally:
                 queue.task_done()
                 if queue.empty():
                     break
