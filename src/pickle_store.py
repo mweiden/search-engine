@@ -6,13 +6,13 @@ from typing import Optional, Type
 from datetime import datetime
 
 from autocomplete.subgraph_cache_trie import SubgraphCacheTrie
-from search.inverted_index import InvertedIndex
+from search.search_index import SearchIndex
 
 
 @dataclass
 class Artifact:
     file_path: str
-    artifact: SubgraphCacheTrie | InvertedIndex
+    artifact: SubgraphCacheTrie | SearchIndex
 
 
 class PickleStore:
@@ -22,7 +22,7 @@ class PickleStore:
             raise FileNotFoundError(f"Directory does not exist: {dir}")
         self.dir = dir
 
-    def save(self, obj: SubgraphCacheTrie | InvertedIndex) -> str:
+    def save(self, obj: SubgraphCacheTrie | SearchIndex) -> str:
         now = datetime.now()
         formatted_date = now.strftime("%Y%m%d%H%M%S")
         file_prefix = self._file_prefix(type(obj))
@@ -31,7 +31,7 @@ class PickleStore:
             pickle.dump(obj, file)
         return pkl_file_name
 
-    def get_latest(self, typ: SubgraphCacheTrie | InvertedIndex) -> Optional[Artifact]:
+    def get_latest(self, typ: SubgraphCacheTrie | SearchIndex) -> Optional[Artifact]:
         file_prefix = self._file_prefix(typ)
         matching_files = glob.glob(f"{self.dir}/{file_prefix}_*.pkl")
         if not matching_files:
@@ -81,5 +81,5 @@ class PickleStore:
     def _file_prefix(self, typ: Type) -> str:
         if typ == SubgraphCacheTrie:
             return "trie"
-        elif typ == InvertedIndex:
+        elif typ == SearchIndex:
             return "inverted_index"

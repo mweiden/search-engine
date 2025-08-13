@@ -6,7 +6,8 @@ from flask_sse import sse
 
 from autocomplete.mermaid import Mermaid
 from autocomplete.subgraph_cache_trie import SubgraphCacheTrie
-from search.inverted_index import InvertedIndex
+from search.search_index import SearchIndex
+from sentence_transformers import CrossEncoder
 from pickle_store import PickleStore
 from util import add_file_handler, get_static_file
 from env import (
@@ -31,14 +32,15 @@ HTML_HOME = get_static_file("index.html")
 HTML_TRIE = get_static_file("trie.html")
 
 # inverted index config
-INVERTED_INDEX_STORAGE = PickleStore(INVERTED_INDEX_STORAGE_PATH)
-INVERTED_INDEX = INVERTED_INDEX_STORAGE.get_latest(InvertedIndex).artifact
+SEARCH_INDEX_STORAGE = PickleStore(INVERTED_INDEX_STORAGE_PATH)
+SEARCH_INDEX = SEARCH_INDEX_STORAGE.get_latest(SearchIndex).artifact
+SEARCH_INDEX.set_cross_encoder(CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2"))
 
 # autocomplete config
 TRIE_STORAGE = PickleStore(TRIE_STORAGE_PATH)
 try:
     AUTOCOMPLETE_TRIE = TRIE_STORAGE.get_latest(SubgraphCacheTrie).artifact
-except AttributeError as e:
+except AttributeError:
     AUTOCOMPLETE_TRIE = SubgraphCacheTrie()
 MERMAID = Mermaid()
 
@@ -63,16 +65,17 @@ def search():
     query = request.form["query"]
     analytics_logger.info(query)
     app.logger.info(f"Received query: {query}")
-    search_results = INVERTED_INDEX.top_k(query)
+    search_results = SEARCH_INDEX.top_k(query)
     return [asdict(result) for result in search_results]
 
 
 @app.route("/inverted-index/load", methods=["POST"])
-def load_inverted_index():
-    global INVERTED_INDEX
-    inverted_index_blob = INVERTED_INDEX_STORAGE.get_latest(InvertedIndex)
-    INVERTED_INDEX = inverted_index_blob.artifact
-    app.logger.info(f"Loaded new inverted index: {inverted_index_blob.file_path}")
+def load_search_index():
+    global SEARCH_INDEX
+    search_index_blob = SEARCH_INDEX_STORAGE.get_latest(SearchIndex)
+    SEARCH_INDEX = search_index_blob.artifact
+    SEARCH_INDEX.set_cross_encoder(CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2"))
+    app.logger.info(f"Loaded new search index: {search_index_blob.file_path}")
     return dict(status="OK")
 
 

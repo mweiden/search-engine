@@ -5,7 +5,7 @@ import tempfile
 import torch
 
 from pickle_store import PickleStore
-from search.inverted_index import InvertedIndex
+from search.search_index import SearchIndex
 
 
 class Dummy:
@@ -27,6 +27,6 @@ def test_get_latest_handles_mps_pickles():
         file_path = os.path.join(tmpdir, "inverted_index_19700101000000.pkl")
         _create_mps_pickle(file_path, Dummy(42))
         store = PickleStore(tmpdir)
-        artifact = store.get_latest(InvertedIndex)
+        artifact = store.get_latest(SearchIndex)
         assert artifact is not None
         assert artifact.artifact.tensor.item() == 42

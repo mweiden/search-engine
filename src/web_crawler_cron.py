@@ -8,7 +8,7 @@ from urllib3.exceptions import MaxRetryError, ReadTimeoutError
 from web_crawler.web_scraper import WebScraper
 from web_crawler.node import Node
 
-from search.inverted_index import InvertedIndex
+from search.search_index import SearchIndex
 from pickle_store import PickleStore
 from env import INVERTED_INDEX_STORAGE_PATH
 
@@ -25,7 +25,7 @@ def seconds_since_program_start():
 
 async def worker(
     worker_id: int,
-    inverted_index: InvertedIndex,
+    search_index: SearchIndex,
     max_depth: int,
     visited: set[str],
     netloc_last_visited_at: dict[str, int],
@@ -47,7 +47,7 @@ async def worker(
                 node.text = scraper.extract_rendered_text()
                 node.title = scraper.driver.title
 
-                inverted_index.insert(node)
+                search_index.insert(node)
 
                 links = scraper.find_all_links()
 
@@ -67,7 +67,7 @@ async def worker(
                         await queue.put(link_node)
 
                 logger.info(
-                    f"index_bytes={sys.getsizeof(inverted_index._inverted_index)} "
+                    f"index_bytes={sys.getsizeof(search_index._inverted_index)} "
                     f"queue_size={queue.qsize()} "
                     f"depth={node.depth} "
                     f"priority={node.priority} "
@@ -94,7 +94,7 @@ async def main():
     num_workers = 32
     seed_url = "https://news.ycombinator.com"
 
-    inverted_index = InvertedIndex()
+    search_index = SearchIndex()
     pickle_store = PickleStore(f"../{INVERTED_INDEX_STORAGE_PATH}")
 
     seed_node = Node(seed_url)
@@ -111,7 +111,7 @@ async def main():
         asyncio.create_task(
             worker(
                 worker_id=i,
-                inverted_index=inverted_index,
+                search_index=search_index,
                 max_depth=max_depth,
                 visited=visited,
                 netloc_last_visited_at=netloc_last_visited_at,
@@ -128,7 +128,7 @@ async def main():
 
     await asyncio.gather(*workers, return_exceptions=True)
 
-    pickle_store.save(inverted_index)
+    pickle_store.save(search_index)
 
 
 if __name__ == "__main__":
