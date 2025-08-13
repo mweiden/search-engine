@@ -1,10 +1,8 @@
 import numpy as np
 import pytest
-import requests
-from sentence_transformers import SentenceTransformer
 
 from web_crawler.node import Node
-from search.inverted_index import InvertedIndex, SearchResult
+from search.inverted_index import InvertedIndex
 from search.tokenizer import tokenize
 
 
@@ -62,21 +60,10 @@ def inverted_index(node0, node1) -> InvertedIndex:
     return inverted_index
 
 
-@pytest.fixture
-def search_result0(node0) -> SearchResult:
-    return SearchResult(node0.id, node0.url, node0.title)
-
-
-@pytest.fixture
-def search_result1(node1) -> SearchResult:
-    return SearchResult(node1.id, node1.url, node1.title)
-
-
-def test_insert(inverted_index, search_result0, search_result1):
-    assert list(tokenize("ipsum")) == ["ipsum"]
-    assert list(tokenize("iterators")) == ["iterators"]
-    assert inverted_index.search("ipsum") == [search_result0]
-    assert inverted_index.search("iterators") == [search_result0, search_result1]
+def test_top_k_keywords(inverted_index, node0, node1):
+    assert inverted_index.top_k("ipsum")[0].id == node0.id
+    ids = [r.id for r in inverted_index.top_k("iterators")[:2]]
+    assert ids == [node1.id, node0.id]
 
 
 def test_num_words_in_doc(inverted_index, node0, node1):

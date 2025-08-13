@@ -24,7 +24,6 @@ class InvertedIndex:
         model: SentenceTransformer | None = None,
         model_name: str = "sentence-transformers/paraphrase-MiniLM-L3-v2",
     ):
-        self._inverted_index: dict[str, list[tuple[str, int]]] = defaultdict(list)
         self._words_per_doc: dict[str, int] = defaultdict(int)
         self._doc_id_to_url: dict[str, str] = dict()
         self._doc_id_to_title: dict[str, str] = dict()
@@ -38,12 +37,10 @@ class InvertedIndex:
 
     @property
     def total_docs(self):
-        return len(self._inverted_index)
+        return len(self._doc_id_to_url)
 
     def insert(self, doc: Node) -> None:
-        counts, total = self._word_count(doc.text)
-        for word, count in counts.items():
-            self._inverted_index[word].append((doc.id, count))
+        _, total = self._word_count(doc.text)
         self._words_per_doc[doc.id] = total
         self._doc_id_to_url[doc.id] = doc.url
         self._doc_id_to_title[doc.id] = doc.title
@@ -64,21 +61,6 @@ class InvertedIndex:
             counts[word] += 1
             total += 1
         return counts, total
-
-    def _search(self, word: str) -> list[tuple[str, int]]:
-        result = self._inverted_index.get(word)
-        return [] if result is None else result
-
-    def search(self, word: str) -> list[SearchResult]:
-        return [
-            SearchResult(
-                id=kv[0],
-                url=self._doc_id_to_url[kv[0]],
-                title=self._doc_id_to_title[kv[0]],
-                score=None,
-            )
-            for kv in self._search(word)
-        ]
 
     def num_words_in_doc(self, doc_id: str) -> int:
         return self._words_per_doc[doc_id]
